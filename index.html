@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Parfum Shop - Alle Parfums</title>
+  <style>
+    /* Reset en basis */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      max-width: 960px;
+      margin: 30px auto;
+      padding: 0 15px;
+      background: #fafafa;
+      color: #222;
+    }
+    h1, h2 {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    /* Filter buttons */
+    .filters {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
+    .filters button {
+      background: #007bff;
+      border: none;
+      padding: 10px 20px;
+      color: white;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.3s;
+    }
+    .filters button.active,
+    .filters button:hover {
+      background: #0056b3;
+    }
+    /* Search box */
+    #searchBox {
+      display: block;
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto 35px auto;
+      padding: 10px 15px;
+      font-size: 1rem;
+      border-radius: 25px;
+      border: 1px solid #ccc;
+      transition: border-color 0.3s;
+    }
+    #searchBox:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+    /* Parfum lijst */
+    .parfum-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit,minmax(140px,1fr));
+      gap: 15px;
+    }
+    .parfum-item {
+      background: white;
+      padding: 15px 10px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgb(0 0 0 / 0.1);
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      text-align: center;
+      user-select: none;
+    }
+    .parfum-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px rgb(0 0 0 / 0.15);
+    }
+    .parfum-item a {
+      text-decoration: none;
+      font-weight: 600;
+      color: #007bff;
+      display: block;
+      user-select: text;
+    }
+    .parfum-item .category-tag {
+      font-size: 0.8rem;
+      color: #555;
+      margin-top: 6px;
+      font-style: italic;
+    }
+    /* Responsive */
+    @media (max-width: 500px) {
+      .filters {
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Parfum Shop</h1>
+  <input type="text" id="searchBox" placeholder="Zoek een parfum..." aria-label="Zoek een parfum" />
+
+  <div class="filters" role="group" aria-label="Filter parfums op categorie">
+    <button class="filter-btn active" data-filter="all">Alles</button>
+    <button class="filter-btn" data-filter="men">Mannen</button>
+    <button class="filter-btn" data-filter="women">Vrouwen</button>
+    <button class="filter-btn" data-filter="unisex">Unisex</button>
+  </div>
+
+  <div class="parfum-list" id="parfumList" role="list" aria-live="polite" aria-label="Lijst van parfums">
+    <!-- Parfums worden hier dynamisch geladen -->
+  </div>
+
+  <script>
+    // Voorbeeld echte parfums met links naar bekende webshops (Bol.com of Douglas)
+    const parfums = [
+      // Mannen (30)
+      { name: "Dior Sauvage", url: "https://www.douglas.nl/product/312720/dior-sauvage-eau-de-toilette", category: "men" },
+      { name: "Bleu de Chanel", url: "https://www.douglas.nl/product/359323/bleu-de-chanel-eau-de-toilette", category: "men" },
+      { name: "Acqua di Gio Profumo", url: "https://www.douglas.nl/product/227022/acqua-di-gio-profumo", category: "men" },
+      { name: "Terre d’Hermès", url: "https://www.douglas.nl/product/116400/terre-dhermes-eau-de-toilette", category: "men" },
+      { name: "Yves Saint Laurent La Nuit de L’Homme", url: "https://www.douglas.nl/product/340056/la-nuit-de-lhomme-eau-de-toilette", category: "men" },
+      { name: "Paco Rabanne Invictus", url: "https://www.douglas.nl/product/306769/invictus-eau-de-toilette", category: "men" },
+      { name: "Giorgio Armani Code", url: "https://www.douglas.nl/product/301474/armani-code", category: "men" },
+      { name: "Versace Eros", url: "https://www.douglas.nl/product/210956/eros-eau-de-toilette", category: "men" },
+      { name: "Givenchy Gentleman", url: "https://www.douglas.nl/product/124156/gentleman-eau-de-toilette", category: "men" },
+      { name: "Jean Paul Gaultier Le Male", url: "https://www.douglas.nl/product/301006/le-male-eau-de-toilette", category: "men" },
+      { name: "Hugo Boss Bottled", url: "https://www.douglas.nl/product/243986/hugo-boss-bottled", category: "men" },
+      { name: "Calvin Klein Euphoria Men", url: "https://www.douglas.nl/product/136139/calvin-klein-euphoria-men", category: "men" },
+      { name: "Tom Ford Noir Extreme", url: "https://www.douglas.nl/product/354029/tom-ford-noir-extreme", category: "men" },
+      { name: "Burberry Mr. Burberry", url: "https://www.douglas.nl/product/233256/mr-burberry", category: "men" },
+      { name: "Dolce & Gabbana The One", url: "https://www.douglas.nl/product/124332/the-one-for-men", category: "men" },
+      { name: "Montblanc Explorer", url: "https://www.douglas.nl/product/353735/montblanc-explorer", category: "men" },
+      { name: "Viktor&Rolf Spicebomb", url: "https://www.douglas.nl/product/118035/spicebomb-eau-de-toilette", category: "men" },
+      { name: "Mugler A*Men", url: "https://www.douglas.nl/product/301836/a-men-eau-de-toilette", category: "men" },
+      { name: "Versace Dylan Blue", url: "https://www.douglas.nl/product/326886/dylan-blue", category: "men" },
+      { name: "Calvin Klein CK One", url: "https://www.douglas.nl/product/136142/calvin-klein-ck-one", category: "men" },
+      { name: "Hermès Equipage", url: "https://www.douglas.nl/product/116466/equipage", category: "men" },
+      { name: "Chanel Allure Homme Sport", url: "https://www.douglas.nl/product/140525/allure-homme-sport", category: "men" },
+      { name: "Jimmy Choo Man", url: "https://www.douglas.nl/product/323054/jimmy-choo-man", category: "men" },
+      { name: "Prada L'Homme", url: "https://www.douglas.nl/product/343778/prada-lhomme", category: "men" },
+      { name: "Issey Miyake L'Eau d'Issey Pour Homme", url: "https://www.douglas.nl/product/144020/l-eau-dissey-pour-homme", category: "men" },
+      { name: "Kenzo Homme", url: "https://www.douglas.nl/product/213120/kenzo-homme", category: "men" },
+      { name: "Bvlgari Man In Black", url: "https://www.douglas.nl/product/337775/man-in-black", category: "men" },
+      { name: "John Varvatos Vintage", url: "https://www.douglas.nl/product/322627/john-varvatos-vintage", category: "men" },
+      { name: "Davidoff Cool Water", url: "https://www.douglas.nl/product/329062/cool-water", category: "men" },
+      { name: "Armani Code Profumo", url: "https://www.douglas.nl/product/304830/armani-code-profumo", category: "men" },
+
+      // Vrouwen (10)
+      { name: "Chanel Coco Mademoiselle", url: "https://www.douglas.nl/product/119044/coco-mademoiselle", category: "women" },
+      { name: "Lancôme La Vie Est Belle", url: "https://www.douglas.nl/product/140535/la-vie-est-belle", category: "women" },
+      { name: "Yves Saint Laurent Black Opium", url: "https://www.douglas.nl/product/301732/black-opium", category: "women" },
+      { name: "Dolce & Gabbana Light Blue", url: "https://www.douglas.nl/product/119067/light-blue", category: "women" },
+      { name: "Marc Jacobs Daisy", url: "https://www.douglas.nl/product/301040/daisy", category: "women" },
+      { name: "Gucci Bloom", url: "https://www.douglas.nl/product/355183/gucci-bloom", category: "women" },
+      { name: "Viktor&Rolf Flowerbomb", url: "https://www.douglas.nl/product/120286/flowerbomb", category: "women" },
+      { name: "Givenchy L’Interdit", url: "https://www.douglas.nl/product/334061/linterdit", category: "women" },
+      { name: "Estée Lauder Modern Muse", url: "https://www.douglas.nl/product/337737/modern-muse", category: "women" },
+      { name: "Tom Ford Black Orchid", url: "https://www.douglas.nl/product/350096/black-orchid", category: "women" },
+
+      // Unisex (10)
+      { name: "Calvin Klein CK One", url: "https://www.douglas.nl/product/136142/calvin-klein-ck-one", category: "unisex" },
+      { name: "Jo Malone London Wood Sage & Sea Salt", url: "https://www.douglas.nl/product/340741/wood-sage-sea-salt", category: "unisex" },
+      { name: "Byredo Gypsy Water", url: "https://www.douglas.nl/product/350658/gypsy-water", category: "unisex" },
+      { name: "Maison Margiela Replica Jazz Club", url: "https://www.douglas.nl/product/356987/replica-jazz-club", category: "unisex" },
+      { name: "Tom Ford Neroli Portofino", url: "https://www.douglas.nl/product/347442/neroli-portofino", category: "unisex" },
+      { name: "Le Labo Santal 33", url: "https://www.douglas.nl/product/357562/santal-33", category: "unisex" },
+      { name: "Diptyque Philosykos", url: "https://www.douglas.nl/product/330242/philosykos", category: "unisex" },
+      { name: "Creed Aventus", url: "https://www.douglas.nl/product/339846/aventus", category: "unisex" },
+      { name: "Escentric Molecules Molecule 01", url: "https://www.douglas.nl/product/352099/molecule-01", category: "unisex" },
+      { name: "Hermès Terre d’Hermès Eau Très Fraîche", url: "https://www.douglas.nl/product/356884/terre-dhermes-eau-tres-fraiche", category: "unisex" },
+    ];
+
+    // Elementen
+    const parfumListEl = document.getElementById('parfumList');
+    const searchBox = document.getElementById('searchBox');
+    const filterButtons = document.querySelectorAll('.filter-btn');
+
+    // Helpers
+    function capitalize(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    // Render functie
+    function renderParfums(filter = 'all', searchTerm = '') {
+      parfumListEl.innerHTML = '';
+
+      let filtered = parfums;
+
+      if(filter !== 'all') {
+        filtered = filtered.filter(p => p.category === filter);
+      }
+      if(searchTerm.trim() !== '') {
+        const term = searchTerm.toLowerCase();
+        filtered = filtered.filter(p => p.name.toLowerCase().includes(term));
+      }
+
+      if(filtered.length === 0) {
+        parfumListEl.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #888;">Geen parfums gevonden.</p>';
+        return;
+      }
+
+      filtered.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'parfum-item';
+        div.setAttribute('role', 'listitem');
+        div.innerHTML = `
+          <a href="${p.url}" target="_blank" rel="noopener noreferrer" title="Bekijk ${p.name} kopen">${p.name}</a>
+          <div class="category-tag">${capitalize(p.category)}</div>
+        `;
+        parfumListEl.appendChild(div);
+      });
+    }
+
+    // Initial render
+    renderParfums();
+
+    // Filter buttons
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterButtons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderParfums(btn.dataset.filter, searchBox.value);
+      });
+    });
+
+    // Search input
+    searchBox.addEventListener('input', () => {
+      const activeFilterBtn = document.querySelector('.filter-btn.active');
+      const currentFilter = activeFilterBtn ? activeFilterBtn.dataset.filter : 'all';
+      renderParfums(currentFilter, searchBox.value);
+    });
+  </script>
+
+</body>
+</html>
